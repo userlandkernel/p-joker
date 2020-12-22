@@ -11,10 +11,10 @@ from iokit_kextclass.print_xformat import to_hex, to_x
 from iokit_kextclass.OSMetaClass import *
 from kernel.offset import MachOHeader
 
-from arm_regs import x_reg_manager
-from mach_struct import *
-from misc_func import *
-from global_info import *
+from .arm_regs import x_reg_manager
+from .mach_struct import *
+from .misc_func import *
+from .global_info import *
 
 from iokitconnection import IOKitConnection
 
@@ -23,9 +23,9 @@ from iokitconnection import IOKitConnection
 def get_single_IMM(insn):
     seg_num = insn.op_count(CS_OP_IMM)
     if seg_num > 1:
-        print "Extract: too much imm reg!"
+        print("Extract: too much imm reg!")
     if seg_num != 1:
-        print "Extract: no imm reg found!"
+        print("Extract: no imm reg found!")
     return to_x(insn.op_find(CS_OP_IMM, 1).value.imm)
 
 def get_mem_op_offset(insn):
@@ -102,7 +102,7 @@ def prepare_static_vars():
     global USER_CLIENT_METHODS
     global STRING_TAB
 
-    for er_item_addr, er_item in STRING_TAB.iteritems():
+    for er_item_addr, er_item in STRING_TAB.items():
         if er_item.startswith("__ZZ") and "UserClient" in er_item:
             USER_CLIENT_METHODS[er_item_addr] = er_item
 
@@ -110,7 +110,7 @@ def prepare_static_vars():
 def prepare_loadcmds(k_header):
     global LOAD_CMDS_TAB
     lc_tab = k_header.macho_get_loadcmds()
-    for key, v in lc_tab.iteritems():
+    for key, v in lc_tab.items():
         LOAD_CMDS_TAB[key] = v
 
 
@@ -157,7 +157,7 @@ def get_OSMetaClass_initFunc(k_header):
             if not cmp(mnemonic, "lea"):
                 seg_num = insn.op_count(CS_OP_REG)
                 if seg_num > 2:
-                    print "Extract: too many regs!"
+                    print("Extract: too many regs!")
 
                 imem_num = insn.op_count(CS_OP_MEM)
                 if imem_num:
@@ -175,7 +175,7 @@ def get_OSMetaClass_initFunc(k_header):
             if not cmp(mnemonic, "mov"):
                 seg_num = insn.op_count(CS_OP_REG)
                 if seg_num > 2:
-                    print "Extract: too many regs!"
+                    print("Extract: too many regs!")
 
                 imem_num = insn.op_count(CS_OP_MEM)
                 # print "imem_num = %d" % imem_num
@@ -233,7 +233,7 @@ def get_OSMetaClass_initFunc(k_header):
                                                                                         meta_class.class_name_addr)
                                 # get vtable for AppleClass*
                                 object_name = "__ZTV%d%s" % (len(meta_class.class_name), meta_class.class_name)
-                                for k, v in STRING_TAB.iteritems():
+                                for k, v in STRING_TAB.items():
                                     if not cmp(v, object_name):
                                         meta_class.object_vt_vm = k
                                         meta_class.object_vt_f = k_header.get_f_from_vm(const_fileaddr, const_vmaddr, k)
@@ -242,7 +242,7 @@ def get_OSMetaClass_initFunc(k_header):
                                 # get vtable for AppleClass*::MetaClass
                                 meta_name = "__ZTVN%d%s%d%sE" % (len(meta_class.class_name), meta_class.class_name,
                                                                   len("MetaClass"), "MetaClass")
-                                for k, v in STRING_TAB.iteritems():
+                                for k, v in STRING_TAB.items():
                                     if not cmp(v, meta_name):
                                         meta_class.metaclass_vt_vm = k
                                         meta_class.metaclass_vt_f = k_header.get_f_from_vm(const_fileaddr, const_vmaddr, k)
@@ -286,7 +286,7 @@ def analysis_need_funcs_addr(k_header):
     const_vmaddr   = k_header.macho_get_vmaddr("__TEXT", "__const")
     const_fileaddr = k_header.macho_get_fileaddr("__TEXT", "__const")
 
-    for meta_class_addr, meta_class in META_CLASSES.iteritems():
+    for meta_class_addr, meta_class in META_CLASSES.items():
         if meta_class.can_ser_open == 1:
             clazz_name = "__ZN%d%s" % (len(meta_class.class_name), meta_class.class_name)
             newUserClient                   = clazz_name + ("%d%s" % (13, "newUserClient"))
@@ -357,7 +357,7 @@ def check_effect_service():
 
     count = 0
     iokit_instance = IOKitConnection("IOKitServices")
-    for meta_class_addr, meta_class in META_CLASSES.iteritems():
+    for meta_class_addr, meta_class in META_CLASSES.items():
         for i in range(0, 100, 1):
             connection = iokit_instance.fuzz_IOServiceOpen(meta_class.class_name, i)
             if not connection:
@@ -372,7 +372,7 @@ def analysis_inheritance_base():
     global META_CLASSES
     global EXT_RELOCATIONS
 
-    for class_self, meta_class in META_CLASSES.iteritems():
+    for class_self, meta_class in META_CLASSES.items():
         super_addr = meta_class.class_super_addr
         extends_rela = ""
         while True:
@@ -440,7 +440,7 @@ def extension_analysis(kext_MachO_f):
 
 
 def print_help():
-    print "Usage:"
-    print " python get_openType-bak.py driver_path"
-    print " Example: python get_openType-bak.py /Users/lilang_wu/Documents/IOS/ios_fuzz/iokit/xxxdriver-analysis/AppleHDA"
+    print("Usage:")
+    print(" python get_openType-bak.py driver_path")
+    print(" Example: python get_openType-bak.py /Users/lilang_wu/Documents/IOS/ios_fuzz/iokit/xxxdriver-analysis/AppleHDA")
 

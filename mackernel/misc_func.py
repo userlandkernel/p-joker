@@ -9,4 +9,4 @@ def demangle(uc_name):
 
 if __name__ == '__main__':
 
-    print demangle("0x961")
+    print(demangle("0x961"))

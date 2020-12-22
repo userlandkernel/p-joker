@@ -26,8 +26,8 @@ def analysis_extensions_v1(root_dir=analysis_root_path):
 
         driver_p = root_dir + os.sep + dri_dir + os.sep + dri_dir
         #print str(i) + "\t" + dri_dir + "\t" + "*" * 50
-        print str(i) + "*" * 120
-        print dri_dir, driver_p
+        print(str(i) + "*" * 120)
+        print(dri_dir, driver_p)
         if i in [106, ]: #56, 96, 103, 107, 124, 125, 126, 128, 129, 131, 150, 164]:
             continue
         if not os.path.exists(driver_p):
@@ -40,9 +40,9 @@ def analysis_extensions_v1(root_dir=analysis_root_path):
             # print str(i) + "\t" + dri_dir + "\t" + "*" * 50
             get_openType(k_header)
             get_type1_selector(k_header)
-            print
-            print
-            print
+            print()
+            print()
+            print()
         #index += 1
         #break
 
@@ -69,13 +69,13 @@ def analysis_extensions_v2(root_dir=analysis_root_path):
 
         k_header = extension_analysis(driver_p)
         if USERSPACE_SERVICES["opened"] != 0:
-            print str(index) + "*" * 120
-            print dri_dir, driver_p
+            print(str(index) + "*" * 120)
+            print(dri_dir, driver_p)
             get_openType(k_header)
             get_type1_selector(k_header)
-            print
-            print
-            print
+            print()
+            print()
+            print()
             index += 1
         #break
 
@@ -86,12 +86,12 @@ def analysis_extensions_v3(driver_path):
     """
     k_header = extension_analysis(driver_path)
     #if USERSPACE_SERVICES["opened"] != 0:
-    print "*" * 120
+    print("*" * 120)
     get_openType(k_header)
     get_type1_selector(k_header)
-    print
-    print
-    print
+    print()
+    print()
+    print()
 
 
 def analysis_extensions_v4(root_dir=analysis_root_path): # only get meta class names of all drivers
@@ -119,8 +119,8 @@ def analysis_extensions_v4(root_dir=analysis_root_path): # only get meta class n
         k_header = extension_analysis(driver_p)
         #if USERSPACE_SERVICES["opened"] != 0:
         global META_CLASSES
-        for meta_class_addr, meta_class in META_CLASSES.iteritems():
-            print meta_class.class_name
+        for meta_class_addr, meta_class in META_CLASSES.items():
+            print(meta_class.class_name)
         index += 1
         #break
 
@@ -133,17 +133,17 @@ def analysis_extensions_v5(driver_p): # only get meta class names of all drivers
     """
     k_header = extension_analysis(driver_p)
     global META_CLASSES
-    for meta_class_addr, meta_class in META_CLASSES.iteritems():
-        print meta_class.class_name
+    for meta_class_addr, meta_class in META_CLASSES.items():
+        print(meta_class.class_name)
 
 
 def Usage():
-    print " Usage: python p-extensions.py -mpfc extension_path/extension_macho"
-    print "\t -h, --help"
-    print "\t -C, --classes: get all the metaclass for all extensions' macho file in the given extension_path"
-    print "\t -c, --class: get all the metaclass for one extension macho"
-    print "\t -m, --macho: only analyze one kernel extension macho"
-    print "\t -M, --machoes: analyze all kernel extensions' macho file in the given extension_path"
+    print(" Usage: python p-extensions.py -mpfc extension_path/extension_macho")
+    print("\t -h, --help")
+    print("\t -C, --classes: get all the metaclass for all extensions' macho file in the given extension_path")
+    print("\t -c, --class: get all the metaclass for one extension macho")
+    print("\t -m, --macho: only analyze one kernel extension macho")
+    print("\t -M, --machoes: analyze all kernel extensions' macho file in the given extension_path")
 
 
 if __name__ == '__main__':
