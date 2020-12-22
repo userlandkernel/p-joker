@@ -7,7 +7,7 @@ import shutil
 
 #from modulegraph.util import *
 
-import mach_o
+from . import mach_o
 
 MAGIC = [
     struct.pack('!L', getattr(mach_o, 'MH_' + _))

@@ -37,16 +37,16 @@ def type_parser1(method_type):
 
     class_dic = type_list[0]
     class_name = method_name = ""
-    for k, v in class_dic.iteritems():
+    for k, v in class_dic.items():
         class_name = method_type[k:k + int(v)]
     method_dic = type_list[1]
-    for k, v in method_dic.iteritems():
+    for k, v in method_dic.items():
         method_name = method_type[k:k + int(v)]
     args = list()
     if len(type_list) > 2:
         for i in range(2, len(type_list), 1):
             dic = type_list[i]
-            for k, v in dic.iteritems():
+            for k, v in dic.items():
                 args.append(method_type[k:k+int(v)])
 
     if not class_name or not method_name:
@@ -69,5 +69,5 @@ def type_parser1(method_type):
 
 
 if __name__ == '__main__':
-    print type_parser("__ZNK15IORegistryEntry16getPathComponentEPcPiPK15IORegistryPlane")
+    print(type_parser("__ZNK15IORegistryEntry16getPathComponentEPcPiPK15IORegistryPlane"))
     #type_parser("__ZN28IOFilterInterruptEventSource4initEP8OSObjectPFvS1_P22IOInterruptEventSourceiEPFbS1_PS_EP9IOServicei")

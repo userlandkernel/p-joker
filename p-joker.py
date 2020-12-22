@@ -1,5 +1,3 @@
-
-
 import os
 import sys
 import platform
@@ -36,7 +34,7 @@ class CommonTool(object):
                 f.write(xmlstr)
             f.close()
             return True
-        except Exception, e:
+        except Exception as e:
             return False
 
     @staticmethod
@@ -46,7 +44,7 @@ class CommonTool(object):
                 f.write(json.dumps(jsonobject))
             f.close()
             return True
-        except Exception, e:
+        except Exception as e:
             return False
 
     @staticmethod
@@ -55,40 +53,40 @@ class CommonTool(object):
         return func_dict
 
 def Usage():
-    print " Usage: python p-joker.py kernelcache -hkls [-Ke bundleID(or list)] [-d dir]"
-    print "\t -h, --help"
-    print "\t -k, --kext_list: list all the kext informations"
-    print "\t -K, --kextdump kext_bundle_identifier: dump this kext"
-    print "\t -d, --dir dumpdir: set the output dir"
-    print "\t -l, --lzss: decrypted the kernelcache"
-    print "\t -e, --extract: extract all meta classes and their methods for given extension bundleID (Note: you'd better use this feature on Linux)\n\n"
-    print " For example:"
-    print "\t decrypt kernelcache, support bvx and complzss format:"
-    print "\t\t $ python p-joker.py kernelcache.encrypted -l\n"
-    print "\t list all the kexts info:"
-    print "\t\t $ python p-joker.py kernelcache.decrypted -k\n"
-    print "\t dump certain kext from kernelcache:"
-    print "\t\t $ python p-joker.py kernelcache.decrypted -K com.apple.iokit.IOHIDFamily\n"
-    print "\t extract all meta class and their functions information for all extensions within kernelcache:"
-    print "\t\t $ python p-joker.py kernelcache.decrypted -e " + '"[' + "'all'" + ']"\n'
-    print "\t extract all meta class and their functions information for certain extensions within kernelcache:"
-    print "\t\t $ python p-joker.py kernelcache.decrypted -e " + '"[' + "'com.apple.iokit.IOHIDFamily'" + ']"\n'
+    print(" Usage: python p-joker.py kernelcache -hkls [-Ke bundleID(or list)] [-d dir]")
+    print("\t -h, --help")
+    print("\t -k, --kext_list: list all the kext informations")
+    print("\t -K, --kextdump kext_bundle_identifier: dump this kext")
+    print("\t -d, --dir dumpdir: set the output dir")
+    print("\t -l, --lzss: decrypted the kernelcache")
+    print("\t -e, --extract: extract all meta classes and their methods for given extension bundleID (Note: you'd better use this feature on Linux)\n\n")
+    print(" For example:")
+    print("\t decrypt kernelcache, support bvx and complzss format:")
+    print("\t\t $ python p-joker.py kernelcache.encrypted -l\n")
+    print("\t list all the kexts info:")
+    print("\t\t $ python p-joker.py kernelcache.decrypted -k\n")
+    print("\t dump certain kext from kernelcache:")
+    print("\t\t $ python p-joker.py kernelcache.decrypted -K com.apple.iokit.IOHIDFamily\n")
+    print("\t extract all meta class and their functions information for all extensions within kernelcache:")
+    print("\t\t $ python p-joker.py kernelcache.decrypted -e " + '"[' + "'all'" + ']"\n')
+    print("\t extract all meta class and their functions information for certain extensions within kernelcache:")
+    print("\t\t $ python p-joker.py kernelcache.decrypted -e " + '"[' + "'com.apple.iokit.IOHIDFamily'" + ']"\n')
 
 
 def print_kext_list(kext_prelink, kext_notprelink):
-    print "\t%-20s%-100s" % ("offset", "Driver Name(Driver BundleID)")
+    print("\t%-20s%-100s" % ("offset", "Driver Name(Driver BundleID)"))
     for driver in kext_prelink:
         for addr, details in driver.iteritems():
             driver_bundleID = details[1]
             driver_name = details[0]
-            #print "\t%-20s%-100s" % (addr, driver_name + " (" + driver_bundleID + ")")
-            print "\t%-20s\t%-100s" % (addr, driver_name + " (" + driver_bundleID + ")")
+            #print("\t%-20s%-100s" % (addr, driver_name + " (" + driver_bundleID + ")")
+            print("\t%-20s\t%-100s" % (addr, driver_name + " (" + driver_bundleID + ")"))
     for driver in kext_notprelink:
         for addr, details in driver.iteritems():
             driver_bundleID = details[1]
             driver_name = details[0]
-            #print "\t%-20s%-100s" % (addr, driver_name + " (" + driver_bundleID + ")")
-            print "\t%-20s\t%-100s" % (addr, driver_name + " (" + driver_bundleID + ")")
+            #print("\t%-20s%-100s" % (addr, driver_name + " (" + driver_bundleID + ")")
+            print("\t%-20s\t%-100s" % (addr, driver_name + " (" + driver_bundleID + ")"))
 
 
 def decrypt_kernelcache(filename, output_dir):
@@ -122,14 +120,14 @@ def decrypt_kernelcache_v1(filename, dec_kernel):
     else:
         cmd = "./lib/lzssdec_elf -o 0x%x < %s > %s" % (offset, filename, dec_kernel)
     os.system(cmd)
-    print "kernelcache is decrypted into file %s" % dec_kernel
+    print("kernelcache is decrypted into file %s" % dec_kernel)
 
 
 def decrypt_kernelcache_v2(data, dec_kernel):
     decompress_data = lzfse.decompress(data)
     with open(dec_kernel, 'w') as f:
         f.write(decompress_data)
-    print "kernelcache is decrypted into file %s" % dec_kernel
+    print("kernelcache is decrypted into file %s" % dec_kernel)
 
 
 def list_services(kernel_f):
@@ -149,11 +147,11 @@ def list_services(kernel_f):
                 services_list.append(se_name)
         se_handler.close()
     os.remove(".services.txt")
-    print "\t--%-22s--" % "service names"
+    print("\t--%-22s--" % "service names")
     for service in services_list:
-        print "\t%-20s" % service
-    #print services_list
-    print "total is: %d" % len(services_list)
+        print("\t%-20s" % service)
+    #print(services_list
+    print("total is: %d" % len(services_list))
 
 
 
@@ -170,7 +168,7 @@ if __name__ == '__main__':
     dump_dir = ""
     extract_sub_ioservice=""
     if not os.path.exists(kernel_f):
-        print "file %s not found!" % kernel_f
+        print("file %s not found!" % kernel_f)
         exit(0)
 
     try:
@@ -235,7 +233,7 @@ if __name__ == '__main__':
                     driver_name = details[0]
                     driver_bundleID = details[1]
                     if "Pseudoextension" in driver_name:
-                        print "kext %s is only a pseudo extension!" % driver_name
+                        print("kext %s is only a pseudo extension!" % driver_name)
                         continue
                     kernel.extract_kext(driver_bundleID, dir=dump_dir)
         elif dump_driver:
@@ -247,20 +245,20 @@ if __name__ == '__main__':
                     if dump_driver == driver_bundleID:
                         isfound = True
                         if "Pseudoextension" in driver_name:
-                            print "kext %s is only a pseudo extension!" % driver_name
+                            print("kext %s is only a pseudo extension!" % driver_name)
                             continue
                         else:
                             kernel.extract_kext(driver_bundleID, dir=dump_dir)
                             if dump_dir:
-                                print "kext %s is dumped in %s!" % (driver_bundleID, dump_dir)
+                                print("kext %s is dumped in %s!" % (driver_bundleID, dump_dir))
                             else:
-                                print "kext %s is dumped in %s!" % (driver_bundleID, os.getcwd())
+                                print("kext %s is dumped in %s!" % (driver_bundleID, os.getcwd()))
             for driver in driver_list_notprelink:
                 for addr, details in driver.iteritems():
                     driver_name = details[0]
                     driver_bundleID = details[1]
                     if dump_driver == driver_bundleID:
                         isfound = True
-                        print "kext %s is not prelinked in kernelcache!" % driver_name
+                        print("kext %s is not prelinked in kernelcache!" % driver_name)
             if not isfound:
-                print "kext %s is not found in this kernelcache!" % dump_driver
+                print("kext %s is not found in this kernelcache!" % dump_driver)

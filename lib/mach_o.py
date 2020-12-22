@@ -13,7 +13,7 @@ See /usr/include/mach-o and friends.
 
 import time
 
-from ptypes import *
+from .ptypes import *
 
 _CPU_ARCH_ABI64 = 0x01000000
 

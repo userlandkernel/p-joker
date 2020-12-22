@@ -196,4 +196,4 @@ if __name__ == '__main__':
         for line in lines:
             func_name = line.split("DCQ")[1]
             func_name_un = func_name.split(";")[0].strip()
-            print '"' + func_name_un + '",'
+            print('"' + func_name_un + '",')

@@ -112,13 +112,13 @@ class KernelMachO(object):
         if not self.isfat and self.is64bit:
             return self.headers[0].section_details
         else:
-            print "file %s is fat or 32bit" % self.filename
+            print("file %s is fat or 32bit" % self.filename)
 
     def get_other_addrs(self):
         if not self.isfat and self.is64bit:
             return self.headers[0].other_segment_details
         else:
-            print "file %s is fat or 32bit" % self.filename
+            print("file %s is fat or 32bit" % self.filename)
 
     def get_driver_list_v1(self):
         driver_list_prelink = self.driver_list_prelink = []
@@ -280,7 +280,7 @@ class KernelMachO(object):
         for driver in self.driver_list_notprelink:
             for addr, details in driver.iteritems():
                 if bundleID in details:
-                    print "kext %s is not prelink in the kernelcache!" % bundleID
+                    print("kext %s is not prelink in the kernelcache!" % bundleID)
                     return None
 
         # get the correction offset
@@ -388,7 +388,7 @@ class MachOHeader(object):
         kw = {'_endian_': self.endian}
         header = self.mach_header.from_fileobj(fh, **kw)
         self.header = header
-        #print hex(header.magic)
+        #print(hex(header.magic)
         #if header.magic != self.MH_MAGIC:
         #    raise ValueError("header has magic %08x, expecting %08x" % (
         #        header.magic, self.MH_MAGIC))
@@ -403,12 +403,12 @@ class MachOHeader(object):
             # read the specific command
 
             klass = LC_REGISTRY.get(cmd_load.cmd, None)
-            # print klass.__name__
+            # print(klass.__name__
             if klass is None:
                 raise ValueError("Unknown load command: %d" % (cmd_load.cmd,))
             cmd_cmd = klass.from_fileobj(fh, **kw)
 
-            #print LC_NAMES[cmd_load.cmd]
+            #print(LC_NAMES[cmd_load.cmd]
             if cmd_load.cmd == LC_ID_DYLIB:
                 # remember where this command was
                 if self.id_cmd is not None:
@@ -462,7 +462,7 @@ class MachOHeader(object):
             else:
                 # data is a raw str
                 #self.other_segment_details[LC_NAMES[cmd_load.cmd]] =
-                #print klass
+                #print(klass
                 data_size = (
                     cmd_load.cmdsize - sizeof(klass) - sizeof(load_command)
                 )

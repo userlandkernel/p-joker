@@ -5,16 +5,16 @@ sys.path.append("../")
 from kernel.offset import MachOHeader
 from kernel.kernel import KernelMachO
 from capstone import *
-from .print_xformat import to_hex, to_x
-from .arm_regs import *
-from .OSMetaClass import OSMetaClass
-from .kext_info import KextDetails
-from .IOService import *
-from .IOUserClient import *
-from .OSInfo import *
+from print_xformat import to_hex, to_x
+from arm_regs import *
+from OSMetaClass import OSMetaClass
+from kext_info import KextDetails
+from IOService import *
+from IOUserClient import *
+from OSInfo import *
 
-from .print_color import *
-from .TypeParser import *
+from print_color import *
+from TypeParser import *
 
 OSMetaClass_OSMetaClass_VMaddr = 0
 IOUserClient_VMaddr = 0
@@ -55,9 +55,9 @@ def init_kext_header(kernel_f, kext_f):
 def get_single_IMM(insn):
     seg_num = insn.op_count(CS_OP_IMM)
     if seg_num > 1:
-        print("\t[-] get_single_IMM: too much imm reg!")
+        print "\t[-] get_single_IMM: too much imm reg!"
     if seg_num != 1:
-        print("\t[-] get_single_IMM: no imm reg found!")
+        print "\t[-] get_single_IMM: no imm reg found!"
     return to_x(insn.op_find(CS_OP_IMM, 1).value.imm)
 
 
@@ -161,7 +161,7 @@ def setup_OSMetaClassFunc(k_header):
     func_init_1 = revise_address(func_init_1)
 
     if func_init_1 < mod_init_vmaddr:
-        print("\t[-] setup_OSMetaClassFunc: wrong func init addr")
+        print "\t[-] setup_OSMetaClassFunc: wrong func init addr"
         exit(1)
 
     cs_handler = Cs(CS_ARCH_ARM64, CS_MODE_LITTLE_ENDIAN)
@@ -176,7 +176,7 @@ def setup_OSMetaClassFunc(k_header):
         if not cmp(mnemonic, "bl"):
             bl_addr = get_single_IMM(insn)
             if bl_addr and osmetaclass_vm:
-                print("\t[-] setup_OSMetaClassFunc: too many bl instr in the Mod_Func_Init_1")
+                print "\t[-] setup_OSMetaClassFunc: too many bl instr in the Mod_Func_Init_1"
             if bl_addr:
                 osmetaclass_vm = bl_addr
         if not cmp(mnemonic, "ret"):
@@ -202,7 +202,7 @@ def setup_IOUserClient(k_header):
     func_init_1 = revise_address(func_init_1)
 
     if func_init_1 < mod_init_vmaddr:
-        print("\t[-] setup_IOUserClient: wrong func init addr")
+        print "\t[-] setup_IOUserClient: wrong func init addr"
         exit(1)
 
     cs_handler = Cs(CS_ARCH_ARM64, CS_MODE_LITTLE_ENDIAN)
@@ -217,7 +217,7 @@ def setup_IOUserClient(k_header):
         if not cmp(mnemonic, "bl"):
             bl_addr = get_single_IMM(insn)
             if bl_addr and osmetaclass_vm:
-                print("\t[-] setup_OSMetaClassFunc: too many bl instr in the Mod_Func_Init_1")
+                print "\t[-] setup_OSMetaClassFunc: too many bl instr in the Mod_Func_Init_1"
             if bl_addr:
                 osmetaclass_vm = bl_addr
         if not cmp(mnemonic, "ret"):
@@ -238,7 +238,7 @@ def get_all_metaclass(k_header=None, iskext=False):  # mod init func
     mod_init_size = k_header.macho_get_size("__DATA_CONST", "__mod_init_func")
 
     total_mif = mod_init_size / 8
-    print("\t[-] get_all_metaclass: total %d kernel base object modinit" % total_mif)
+    print "\t[-] get_all_metaclass: total %d kernel base object modinit" % total_mif
 
     for i in range(0, total_mif):
         each_mif_vm = k_header.get_mem_from_vmaddr(mod_init_fileaddr, mod_init_vmaddr, mod_init_vmaddr + i * 8)
@@ -260,7 +260,7 @@ def get_all_metaclass(k_header=None, iskext=False):  # mod init func
                 imm = get_single_IMM(insn)
                 seg_num = insn.op_count(CS_OP_REG)
                 if seg_num > 2:
-                    print("\t[-] get_all_metaclass: too many regs!")
+                    print "\t[-] get_all_metaclass: too many regs!"
                 index = insn.op_find(CS_OP_REG, 1)
                 s_reg = index.value.reg
                 set_actual_value_by_regN(s_reg, eval(imm))
@@ -279,7 +279,7 @@ def get_all_metaclass(k_header=None, iskext=False):  # mod init func
                         f_reg_v = s_reg_v + eval(imm)
                         set_actual_value_by_regN(f_reg, f_reg_v)
                     elif imm_num > 2:
-                        print("\t[-] get_all_metaclass: add op has two or more imm!")
+                        print "\t[-] get_all_metaclass: add op has two or more imm!"
                         exit(1)
 
             if not (cmp(mnemonic, "mov") and cmp(mnemonic, "movz")) :
@@ -413,7 +413,7 @@ def is_real_osobject_operator_new_address(k_header, bl_addr_vm):
             imm = get_single_IMM(insn)
             seg_num = insn.op_count(CS_OP_REG)
             if seg_num > 2:
-                print("\t[-] is_real_osobject_operator_new_address: too many regs!")
+                print "\t[-] is_real_osobject_operator_new_address: too many regs!"
             index = insn.op_find(CS_OP_REG, 1)
             s_reg = index.value.reg
             set_actual_value_by_regN(s_reg, eval(imm))
@@ -436,7 +436,7 @@ def is_real_osobject_operator_new_address(k_header, bl_addr_vm):
                             return True
 
                 elif imm_num > 2:
-                    print("\t[-] is_real_osobject_operator_new_address: add op has two or more imm!")
+                    print "\t[-] is_real_osobject_operator_new_address: add op has two or more imm!"
                     exit(1)
     return False
 
@@ -462,11 +462,11 @@ def analysis_mif(k_header=None, iskext=False):  # mod init func
         mod_init_size = k_header.macho_get_size("__DATA_CONST", "__mod_init_func")
 
     if mod_init_vmaddr == 0 and mod_init_size == 0 and mod_init_fileaddr == 0:
-        print("\t\t[>] analysis_mif: please confirm the version of kernelcahce first")
+        print "\t\t[>] analysis_mif: please confirm the version of kernelcahce first"
         exit(-2)
 
     total_mif = mod_init_size / 8
-    print("\t\t[>] analysis_mif: total %d kernel base object modinit" % total_mif)
+    print "\t\t[>] analysis_mif: total %d kernel base object modinit" % total_mif
 
     if iskext:
         start_index = 0
@@ -477,7 +477,7 @@ def analysis_mif(k_header=None, iskext=False):  # mod init func
         each_mif_vm = k_header.get_mem_from_vmaddr(mod_init_fileaddr, mod_init_vmaddr, mod_init_vmaddr + i * 8)
         each_mif_vm = revise_address(each_mif_vm)
         each_mif_f = k_header.get_f_from_vm(mod_init_fileaddr, mod_init_vmaddr, each_mif_vm)
-        print("\t\t[>] (%d/%d) analysis_mif: start to analyze init function %s ..." % (i, total_mif - start_index, hex(each_mif_vm)))
+        print "\t\t[>] (%d/%d) analysis_mif: start to analyze init function %s ..." % (i, total_mif - start_index, hex(each_mif_vm))
         _analyze_init_func(k_header, each_mif_f, each_mif_vm, iskext)
 
 
@@ -498,14 +498,14 @@ def _analyze_init_func(k_header, each_mif_f, each_mif_vm, iskext, debug=False):
         op_str = insn.op_str
 
         if iskext and debug:
-            print(("\t[-] _analyze_init_func: 0x%x:\t%s\t%s" % (address, mnemonic, op_str)))
+            print("\t[-] _analyze_init_func: 0x%x:\t%s\t%s" % (address, mnemonic, op_str))
 
         # print("\t[-] _analyze_init_func: 0x%x:\t%s\t%s" % (address, mnemonic, op_str))
         if not (cmp(mnemonic, "adrp") and cmp(mnemonic, "adr")):
             imm = get_single_IMM(insn)
             seg_num = insn.op_count(CS_OP_REG)
             if seg_num > 2:
-                print("\t[-] _analyze_init_func: too many regs!")
+                print "\t[-] _analyze_init_func: too many regs!"
             index = insn.op_find(CS_OP_REG, 1)
             s_reg = index.value.reg
             set_actual_value_by_regN(s_reg, eval(imm))
@@ -524,7 +524,7 @@ def _analyze_init_func(k_header, each_mif_f, each_mif_vm, iskext, debug=False):
                     f_reg_v = s_reg_v + eval(imm)
                     set_actual_value_by_regN(f_reg, f_reg_v)
                 elif imm_num > 2:
-                    print("\t[-] _analyze_init_func: add op has two or more imm!")
+                    print "\t[-] _analyze_init_func: add op has two or more imm!"
                     exit(1)
 
         if not (cmp(mnemonic, "mov") and cmp(mnemonic, "movz")) :
@@ -740,7 +740,7 @@ def parse_const_func(k_header, meta_class, x_metaclass_vt_vm, x_metaclass_vt_f, 
         # first: we should search it from string table
         # second: if no found, ugly, only have to search one by one
         object_name = "__ZTV%d%s" % (len(meta_class.class_name), meta_class.class_name)
-        for k, v in STRING_TAB.items():
+        for k, v in STRING_TAB.iteritems():
             if not cmp(v, object_name):
                 meta_class.object_vt_vm = k
                 meta_class.object_vt_f = k_header.get_f_from_vm(const_start_f, const_start_vm, k)
@@ -789,7 +789,7 @@ def parse_const_func(k_header, meta_class, x_metaclass_vt_vm, x_metaclass_vt_f, 
                     imm = get_single_IMM(insn)
                     seg_num = insn.op_count(CS_OP_REG)
                     if seg_num > 2:
-                        print("\t[-] parse_const_func: too many regs!")
+                        print "\t[-] parse_const_func: too many regs!"
                     index = insn.op_find(CS_OP_REG, 1)
                     s_reg = index.value.reg
                     set_actual_value_by_regN(s_reg, eval(imm))
@@ -814,7 +814,7 @@ def parse_const_func(k_header, meta_class, x_metaclass_vt_vm, x_metaclass_vt_f, 
                                 meta_class.object_vt_f = k_header.get_f_from_vm(mod_init_fileaddr, mod_init_vmaddr, f_reg_v)
                                 break
                         elif imm_num > 2:
-                            print("\t[-] parse_const_func: add op has two or more imm!")
+                            print "\t[-] parse_const_func: add op has two or more imm!"
                             exit(1)
 
                 if not cmp(mnemonic, "ret"):
@@ -937,7 +937,7 @@ def parse_const_func(k_header, meta_class, x_metaclass_vt_vm, x_metaclass_vt_f, 
                     imm = get_single_IMM(insn)
                     seg_num = insn.op_count(CS_OP_REG)
                     if seg_num > 2:
-                        print("\t[-] parse_const_func: too many regs!")
+                        print "\t[-] parse_const_func: too many regs!"
                     index = insn.op_find(CS_OP_REG, 1)
                     s_reg = index.value.reg
                     set_actual_value_by_regN(s_reg, eval(imm))
@@ -964,7 +964,7 @@ def parse_const_func(k_header, meta_class, x_metaclass_vt_vm, x_metaclass_vt_f, 
                                                                                 f_reg_v)
                                 break
                         elif imm_num > 2:
-                            print("\t[-] parse_const_func: add op has two or more imm!")
+                            print "\t[-] parse_const_func: add op has two or more imm!"
                             exit(1)
 
                 if not cmp(mnemonic, "ret"):
@@ -1140,12 +1140,12 @@ def is_getMetaClass_func(cs_insn, meta_class):
 
     if not cmp(insns[0].mnemonic, "adr"):
         if not cmp(insns[1].mnemonic, "ret"):
-            print("asdfasdf")
-            print(insns[1].address)
+            print "asdfasdf"
+            print insns[1].address
 
         elif not cmp(insns[1].mnemonic, "nop"):
-            print("dddddddd")
-            print(insns[1].address)
+            print "dddddddd"
+            print insns[1].address
 
     return None
 
@@ -1170,7 +1170,7 @@ def get_jump_addr(k_header, cs_handler, bl_addr_vm, bl_addr_f):
             imm = get_single_IMM(insn)
             seg_num = insn.op_count(CS_OP_REG)
             if seg_num > 2:
-                print("\t[-] get_jump_addr: too many regs!")
+                print "\t[-] get_jump_addr: too many regs!"
             index = insn.op_find(CS_OP_REG, 1)
             s_reg = index.value.reg
             set_actual_value_by_regN(s_reg, eval(imm))
@@ -1208,7 +1208,7 @@ def analysis_inheritance_base(iskext, debug):
 
     index = 1
     if iskext:
-        for class_self, meta_class in DRIVER_CLASS.items():
+        for class_self, meta_class in DRIVER_CLASS.iteritems():
             super_addr = meta_class.class_super_addr
             super_class_name = ""
             while True:
@@ -1236,22 +1236,22 @@ def analysis_inheritance_base(iskext, debug):
 
             # print the debug info
             if debug:
-                print()
-                print("\t[-] (%d/%d) meta class: %s " % (index, len(DRIVER_CLASS), meta_class.class_name))
-                print("\t\t(0x%x)->OSMetaClass:OSMetaClass call 4 args list" % meta_class.class_self_addr)
+                print
+                print "\t[-] (%d/%d) meta class: %s " % (index, len(DRIVER_CLASS), meta_class.class_name)
+                print "\t\t(0x%x)->OSMetaClass:OSMetaClass call 4 args list" % meta_class.class_self_addr
                 # print "ClassName:0x%x" % meta_class.class_self_addr
-                print("\t\tClassName : %s" % meta_class.class_name)
+                print "\t\tClassName : %s" % meta_class.class_name
                 if meta_class.class_super_addr:
-                    print("\t\tSuperClass: %s" % meta_class.class_super_name)
+                    print "\t\tSuperClass: %s" % meta_class.class_super_name
                 #else:
-                print("\t\tSuperClass: 0x%x" % meta_class.class_super_addr)
-                print("\t\tClassSize : 0x%x" % meta_class.class_size)
+                print "\t\tSuperClass: 0x%x" % meta_class.class_super_addr
+                print "\t\tClassSize : 0x%x" % meta_class.class_size
                 # print meta_class.class_super_list
                 printfunc(meta_class)
 
             index += 1
     else:
-        for class_self, meta_class in BASE_CLASS.items():
+        for class_self, meta_class in BASE_CLASS.iteritems():
             super_addr = meta_class.class_super_addr
             super_class_name = ""
             while True:
@@ -1269,13 +1269,13 @@ def analysis_inheritance_base(iskext, debug):
 
             # print the debug info
             if debug:
-                print()
-                print("\t[-] (%d/%d) meta class: %s " % (index, len(BASE_CLASS), meta_class.class_name))
-                print("\t\t(0x%x)->OSMetaClass:OSMetaClass call 4 args list" % meta_class.class_self_addr)
+                print
+                print "\t[-] (%d/%d) meta class: %s " % (index, len(BASE_CLASS), meta_class.class_name)
+                print "\t\t(0x%x)->OSMetaClass:OSMetaClass call 4 args list" % meta_class.class_self_addr
                 #print "ClassName:0x%x" % meta_class.class_self_addr
-                print("\t\tClassName : %s" % meta_class.class_name)
-                print("\t\tSuperClass: %s" % meta_class.class_super_name)
-                print("\t\tClassSize : 0x%x" % meta_class.class_size)
+                print "\t\tClassName : %s" % meta_class.class_name
+                print "\t\tSuperClass: %s" % meta_class.class_super_name
+                print "\t\tClassSize : 0x%x" % meta_class.class_size
                 printfunc(meta_class)
             index += 1
 
@@ -1289,18 +1289,18 @@ def printfunc(meta_class):
         func_addr = func.split("\t")[0]
         func_name = func.split("\t")[1]
         if "sub_" in func_name:
-            print("\t\t%-3d: %-25s%-40s" % (index, func_addr, func_name))
+            print "\t\t%-3d: %-25s%-40s" % (index, func_addr, func_name)
             index += 1
             continue
         if "IOUserClient" in func_name:
             highlight = "\t\t%-3d: %-25s%-40s" % (index, func_addr, type_parser(func_name))
             printRed(highlight)
         else:
-            print("\t\t%-3d: %-25s%-40s" % (index, func_addr, type_parser(func_name)))
+            print "\t\t%-3d: %-25s%-40s" % (index, func_addr, type_parser(func_name))
         index += 1
 
     if "IOService" in meta_class.class_super_name:
-        print("\t\t[*] %s vtable: %s [*]" % (meta_class.class_name, hex(meta_class.object_vt_vm)))
+        print "\t\t[*] %s vtable: %s [*]" % (meta_class.class_name, hex(meta_class.object_vt_vm))
 
         # print class title
         title = "\t\t%-3s  %-25s%-60s" % (" ", "Method Address ", meta_class.class_name)
@@ -1318,7 +1318,7 @@ def printfunc(meta_class):
                 title += super_c_n
 
         if meta_class.object_vt_vm:
-            print(title)
+            print title
 
         # join the method name string
         index = 0
@@ -1356,16 +1356,16 @@ def printfunc(meta_class):
             if "IOUserClient" in print_str:
                 printRed(print_str)
             else:
-                print(print_str)
+                print print_str
             index += 1
     else:
-        print("\t\t-[*] %s vtable:%s [*]-" % (meta_class.class_name, hex(meta_class.object_vt_vm)))
+        print "\t\t-[*] %s vtable:%s [*]-" % (meta_class.class_name, hex(meta_class.object_vt_vm))
         index = 0
         for instance in meta_class.instance_list:
             instance_addr = instance.split("\t")[0]
             instance_name = instance.split("\t")[1]
             if "sub_" in instance_name:
-                print("\t\t%-3d: %-25s%-60s" % (index, instance_addr, instance_name))
+                print "\t\t%-3d: %-25s%-60s" % (index, instance_addr, instance_name)
                 index += 1
                 continue
             if "IOUserClient" in instance_name:
@@ -1373,7 +1373,7 @@ def printfunc(meta_class):
                 printRed(highlight)
             else:
                 #print instance
-                print("\t\t%-3d: %-25s%-60s" % (index, instance_addr, type_parser(instance_name)))
+                print "\t\t%-3d: %-25s%-60s" % (index, instance_addr, type_parser(instance_name))
             index += 1
 
 
@@ -1384,7 +1384,7 @@ def analysis_mif_kext(kernel_header, kernel_f, kexts):
     global KEXT_DETAILS
 
     if not isinstance(kexts, list):
-        print("\t[-] analysis_mif_kext: bad kexts args")
+        print "\t[-] analysis_mif_kext: bad kexts args"
         return
 
     kernel_handler = KernelMachO(kernel_f)
@@ -1403,22 +1403,22 @@ def analysis_mif_kext(kernel_header, kernel_f, kexts):
         else:
             for kext in kexts:
                 if kext in driver_list_np:
-                    print("\t[-] analysis_mif_kext: kernel extension %s no need to parse!" % kext)
+                    print "\t[-] analysis_mif_kext: kernel extension %s no need to parse!" % kext
                     exit(2)
 
                 if kext not in driver_list_p:
-                    print("\t[-] analysis_mif_kext: kernel extension %s  not found!" % kext)
+                    print "\t[-] analysis_mif_kext: kernel extension %s  not found!" % kext
                     exit(2)
 
                 if kext not in KEXT_DETAILS:
-                    print("\t[-] analysis_mif_kext: kernel extension %s  can not find exec text section region!" % kext)
+                    print "\t[-] analysis_mif_kext: kernel extension %s  can not find exec text section region!" % kext
                     exit(2)
 
                 kext_detail = KEXT_DETAILS[kext]
                 kmod_init_func_list = kernel_handler.get_kmod_init_functions()
                 for kmod_func_vm in kmod_init_func_list:
                     if kext_detail.exec_text_start_vm < kmod_func_vm < kext_detail.exec_text_end_vm:
-                        print("\t\t[>] analysis_mif_kext: analyzing the kernel extension init Func - %s " % hex(kmod_func_vm))
+                        print "\t\t[>] analysis_mif_kext: analyzing the kernel extension init Func - %s " % hex(kmod_func_vm)
                         kmod_func_f = kernel_header.get_f_from_vm_by_offset(prelink_f_offset, kmod_func_vm)
                         _analyze_init_func(kernel_header, kmod_func_f, kmod_func_vm, True)
 
@@ -1428,8 +1428,8 @@ def analysis_mif_kext(kernel_header, kernel_f, kexts):
         if not cmp(kexts[0], "all"):
             index = 1
             total_k = len(driver_list_p)
-            for kext_name, kext_vm in driver_list_p.items():
-                print("\t[-] analysis_mif_kext: (%d/%d) analyzing kernel extensions %s " % (index, total_k, kext_name))
+            for kext_name, kext_vm in driver_list_p.iteritems():
+                print "\t[-] analysis_mif_kext: (%d/%d) analyzing kernel extensions %s " % (index, total_k, kext_name)
                 if kext_name in ["com.apple.driver.AppleT8015CLPC", "com.apple.filesystems.hfs.kext"]:
                     continue
                 # init kext_header
@@ -1445,16 +1445,16 @@ def analysis_mif_kext(kernel_header, kernel_f, kexts):
         else:
             for kext in kexts:
                 if kext in driver_list_np:
-                    print("\t[-] analysis_mif_kext: kernel extension %s no need to parse!" % kext)
+                    print "\t[-] analysis_mif_kext: kernel extension %s no need to parse!" % kext
                     exit(2)
                 if kext not in driver_list_p:
-                    print("\t[-] analysis_mif_kext: kernel extension %s  not found!" % kext)
+                    print "\t[-] analysis_mif_kext: kernel extension %s  not found!" % kext
                     exit(2)
 
                 # init kext_header
                 kext_vm = int(driver_list_p[kext], 16)
                 kext_f = kext_vm - prelink_f_offset
-                print(hex(kext_vm), hex(kext_f))
+                print hex(kext_vm), hex(kext_f)
                 kext_header = init_kext_header(kernel_f, kext_f)
                 kext_header.prelink_offset = prelink_f_offset
                 kext_header.kernel_header = kernel_header
@@ -1489,9 +1489,9 @@ def prepare_text_exec_regions(kernel_header, kernel_f, debug=False):
     driver_list_p, driver_list_np = kernel_handler.get_driver_list_v2()
     index = 1
     total_k = len(driver_list_p)
-    for kext_bundler, kext_vm in driver_list_p.items():
+    for kext_bundler, kext_vm in driver_list_p.iteritems():
         if debug:
-            print("\t[-] prepare_text_exec_regions: (%d/%d) get '__TEXT_EXEC,__text' region from %s " % (index, total_k, kext_bundler))
+            print "\t[-] prepare_text_exec_regions: (%d/%d) get '__TEXT_EXEC,__text' region from %s " % (index, total_k, kext_bundler)
         if kext_bundler in ["com.apple.driver.AppleT8015CLPC", "com.apple.filesystems.hfs.kext"]:
             continue
 
@@ -1546,8 +1546,8 @@ def get_metaclass_v1(kernel_header, kernel_f, driver_list_p, prelink_f_offset):
 
     index = 1
     total_k = len(driver_list_p)
-    for kext_name, kext_vm in driver_list_p.items():
-        print("\t[-] get_metaclass_v1: (%d/%d) get metaclasses from %s ..." % (index, total_k, kext_name))
+    for kext_name, kext_vm in driver_list_p.iteritems():
+        print "\t[-] get_metaclass_v1: (%d/%d) get metaclasses from %s ..." % (index, total_k, kext_name)
         index += 1
         if kext_name in ["com.apple.driver.AppleT8015CLPC", "com.apple.filesystems.hfs.kext"]:
             continue
@@ -1581,7 +1581,7 @@ def get_metaclass_v2(k_header, kernel_handler, prelink_f_offset):
                 imm = get_single_IMM(insn)
                 seg_num = insn.op_count(CS_OP_REG)
                 if seg_num > 2:
-                    print("\t[-] get_metaclass_v2: too many regs!")
+                    print "\t[-] get_metaclass_v2: too many regs!"
                 index = insn.op_find(CS_OP_REG, 1)
                 s_reg = index.value.reg
                 set_actual_value_by_regN(s_reg, eval(imm))
@@ -1600,7 +1600,7 @@ def get_metaclass_v2(k_header, kernel_handler, prelink_f_offset):
                         f_reg_v = s_reg_v + eval(imm)
                         set_actual_value_by_regN(f_reg, f_reg_v)
                     elif imm_num > 2:
-                        print("\t[-] get_metaclass_v2: add op has two or more imm!")
+                        print "\t[-] get_metaclass_v2: add op has two or more imm!"
                         exit(1)
 
             if not (cmp(mnemonic, "mov") and cmp(mnemonic, "movz")):
@@ -1686,26 +1686,26 @@ def get_metaclass_v2(k_header, kernel_handler, prelink_f_offset):
 
 def getSubIOServicesClass(kernel_f, sub_ioservice):
     k_header = init_kernel_header(kernel_f)
-    print("[+] prepare string table")
+    print "[+] prepare string table"
     prepare_string(k_header, kernel_f)
-    print("[+] prepare some critical offsets")
+    print "[+] prepare some critical offsets"
     prepare_offset(k_header)
-    print("[+] prepare the region range of (__TEXT_EXEC, __text) section for each kernel extension")
+    print "[+] prepare the region range of (__TEXT_EXEC, __text) section for each kernel extension"
     prepare_text_exec_regions(k_header, kernel_f)
-    print("[+] prepare the region range of prelink sections for IOS 10/11")
+    print "[+] prepare the region range of prelink sections for IOS 10/11"
     prepare_prelink_regions(k_header)
 
-    print("[+] setup OSMetaClass::OSMetaClass(char const*,OSMetaClass const*,uint) function address")
+    print "[+] setup OSMetaClass::OSMetaClass(char const*,OSMetaClass const*,uint) function address"
     setup_OSMetaClassFunc(k_header)
 
-    print("[+] start analyze the meta classes within kernel")
+    print "[+] start analyze the meta classes within kernel"
     analysis_mif(k_header)
-    print("[+] build the relationship for meta classes within kernel")
+    print "[+] build the relationship for meta classes within kernel"
     analysis_inheritance_base(False, False)
 
-    print("[+] start analyze the meta classes within each kernel extensions")
+    print "[+] start analyze the meta classes within each kernel extensions"
     analysis_mif_kext(k_header, kernel_f, sub_ioservice)
-    print("[+] build the relationship for meta classes")
+    print "[+] build the relationship for meta classes"
     analysis_inheritance_base(True, True)
 
 
